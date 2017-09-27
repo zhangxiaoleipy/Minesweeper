@@ -1,0 +1,556 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+
+body{
+    padding: 20px;
+    font-family: "微软雅黑";
+    background-color: #FFF;
+}
+
+#minesweeper{
+    color : #444;
+    position: absolute;
+    top : 30px;
+    left : 50px;
+    border : 1px solid #888;
+    display: table;
+    box-shadow: 0 0 10px #777;
+    border-radius: 5px;
+    background-color: #E3E9EB;
+    user-select:none;
+    -webkit-user-select: none;
+}
+
+#nav{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-sizing: border-box;
+    cursor: default;
+    text-align: center;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    margin: 5px 5px 0 5px;
+    height: 25px;
+    border : 1px solid #AAA4A4;
+    border-bottom: none;
+    background : linear-gradient(to bottom, #F0F0F0, #DDD);
+}
+
+#nav span{
+    font-size: 0.8em;
+    margin-left: 5px;
+    color : #555;
+}
+
+#container{
+    box-sizing: border-box;
+    cursor: default;
+    background-color: #F8F4F4;
+    position: relative;
+    margin : 0 5px 5px 5px;
+    padding: 10px 10px 25px 10px;
+    border : 1px solid #AAA4A4;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+#desk{
+    margin: 5px 20px;
+    border-collapse : collapse;
+    box-shadow: 0 0 1px #999;
+}
+
+#desk tr td{
+    cursor: default;
+    position: relative;
+    text-align: center;
+    width : 18px;
+    height: 18px;
+    border : 1px solid #333;
+}
+
+/*--------------COVER-CLUE-MINE----------------------*/
+
+#desk tr td .cover, #desk tr td .clueTop, #desk tr td .clue, #desk tr td .mine{
+    position: absolute;
+    top : 0;
+    left : 0;
+    width : 100%;
+    height: 100%;
+    line-height: 18px;
+}
+
+/*------------------COVER-------------------------*/
+
+#desk tr td .cover .coverTop {
+    position: absolute;
+    width : 100%;
+    height: 100%;
+    z-index: 10;
+    font-weight: bold;
+    color: white;
+}
+
+#desk tr td .cover .coverMiddle{
+    z-index: 9;
+    position: relative;
+}
+
+#desk tr td .cover .coverMiddle:before{
+    position: absolute;
+    top : 1px;
+    left : 6px;
+    content: "";
+    border-left: 1px solid #333;
+    height: 16px;
+    box-shadow: 1px 1px 1px gray;
+}
+
+#desk tr td .cover .coverMiddle:after{
+    position: absolute;
+    content: "";
+    top : 1px;
+    left: 7px;
+    border-top : 8px solid #C20E0E;
+    border-top-right-radius: 4px;
+    width : 8px;
+    box-shadow: 1px 2px 1px gray;
+}
+
+#desk tr td .cover .coverBottom{
+    position: absolute;
+    left: 0;
+    top : 0;
+    width : 100%;
+    height: 100%;
+    z-index: 8;
+}
+
+/*-----------------CLUE--------------------------*/
+
+#desk tr td .clueTop{
+    transform: scale(1.2,1.2);
+    color : red;
+    position: absolute;
+    z-index: 7;
+}
+
+#desk tr td .clue{
+    position: absolute;
+    z-index: 7;
+}
+
+/*------------------MINE-------------------------*/
+
+#desk tr td .mine .mineCover{
+    position: absolute;
+    width : 100%;
+    height: 100%;
+    z-index: 6;
+    background-color: rgb(206,215,231);
+}
+
+#desk tr td .mine .mineMine{
+    position: relative;
+    z-index: 5;
+    top : 2px;
+    left: 2px;
+    border : 2px solid #333;
+    width : 10px;
+    height: 10px;
+    border-radius: 8px;
+    background-color: #333;
+}
+
+#desk tr td .mine .mineMine:before{
+    position: absolute;
+    content: "";
+    left : -1.5px;
+    top : -1.5px;
+    border : 1.5px solid #333;
+    border-radius: 1.5px;
+    box-shadow: 5.5px -2px #333,
+                10.5px 0 #333,
+                13px 5px #333,
+                10.5px 10.5px #333,
+                5.5px 12px #333,
+                0 10.5px #333,
+                -2px 5px #333,
+                2px 2px #fff;
+}
+
+#desk tr td .mine .minebg{
+    position: absolute;
+    top : 0;
+    left: 0;
+    width : 100%;
+    height: 100%;
+    z-index: 4;
+    background-color: rgb(139, 193, 147);
+}
+
+/*----------------------------------------------*/
+
+#topTools {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    text-align: center;
+    margin: 5px auto 10px auto;
+}
+
+#topTools .toolBox{
+    display: table;
+}
+
+#topTools .label{
+    color : #888;
+    display: inline-block;
+    font-size: 0.7em;
+}
+
+#topTools #timer, #topTools #mineNum{
+    color : #555;
+    text-shadow: 1px 1px 2px gray;
+    text-align: center;
+    border : 1px solid #eee;
+    display: inline-block;
+    width : 48px;
+    border-radius: 3px;
+    background-color: rgba(201, 206, 211, 0.7);
+    box-shadow: inset 1px 1px 1px #AAA4A4;
+}
+
+/*---------------SETTING----------------*/
+
+#setting{
+    float: left;
+    position: absolute;
+    left : 2px;
+    top : 2px;
+    border-radius : 3px;
+    margin-left: 1px;
+    margin-top : 1px;
+    height: 19px;
+    width : 30px;
+}
+
+#setting:hover{
+    background-color: #DFD9D9;
+}
+
+#setting:before{
+    content: "";
+    position: absolute;
+    border-top : 1px solid #333;
+    top : 4px;
+    left: 4px;
+    width : 22px;
+    box-shadow:  0 5px #333, 0 10px #333;
+}
+
+#setList{
+    font-size: 0.9em;
+    position: relative;
+    color : #333;
+    display: none;
+    top : 16px;
+    left: 0;
+    z-index: 11;
+}
+
+#setList ul{
+    padding: 3px 4px 3px 5px;
+    width : 4.5em;
+    background-color: #F5F5F5;
+    box-shadow: -1px 0 2px #555, 1px 2px 3px #555;
+    border-radius: 3px;
+}
+
+#setList ul li{
+    position: relative;
+    list-style: none;
+    text-align: left;
+    cursor: default;
+    margin: 2px 0;
+    padding-left: 2px;
+}
+
+#setList li:hover{
+    background-color: skyblue;
+}
+
+#setList ul li:hover ul{
+    display: block;
+}
+
+#setList ul ul {
+    z-index: 12;
+    border : 1px solid gray;
+    position: absolute;
+    list-style: none;
+    width : 4.5em;
+    top : -1px;
+    left : 4.4em;
+    background-color: #F5F5F5;
+    box-shadow: -1px 0 5px #999, 1px 1px 8px #555;
+}
+
+#setList ul li>ul{
+    display: none;
+}
+
+.spot{
+    display: inline-block;
+    position: absolute;
+}
+
+.spot:before{
+    content: "";
+    position: absolute;
+    border-left: 1px solid gray;
+    height: 1px;
+    left: 25px;
+    top : 6px;
+    box-shadow: 1px 1px gray,2px 2px gray,3px 3px gray,4px 4px gray,
+    3px 5px gray, 2px 6px gray, 1px 7px gray, 0px 8px gray;
+}
+
+/*************************************************/
+
+#winInfo{
+    display: none;
+    position: absolute;
+    z-index: 15;
+    background-color: white;
+    width : 14em;
+    height: 7em;
+    border : 1px solid gray;
+    border-radius: 5px;
+    box-shadow: 0 0 5px #333;
+}
+
+#winInfo #winContent {
+    text-align: center;
+    margin: 1em auto;
+    width : 8em;
+}
+
+#winInfoBT{
+    cursor: pointer;
+    position: absolute;
+    left : 5.8em;
+    padding: 2px 5px;
+    border : 1px solid gray;
+    border-radius: 4px;
+}
+
+/*******************************************/
+
+#gamesInfo{
+    display: none;
+    font-size: 0.8em;
+    z-index: 15;
+    position: absolute;
+    border : 1px solid #888;
+    border-radius: 5px;
+    background-color: #E3E9EB;
+    box-shadow: 0 0 10px #777;
+}
+
+#gamesInfo #top{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: default;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    box-sizing: border-box;
+    border : 1px solid #AAA4A4;
+    border-bottom: none;
+    height: 25px;
+    width : 410px;
+    margin: 5px 5px 0 5px;
+    background : linear-gradient(to bottom, #F0F0F0, #DDD);
+}
+
+#gamesInfo #top span{
+    margin-left: 5px;
+}
+
+#goContent{
+    box-sizing: border-box;
+    position: relative;
+    margin: 0 5px 5px 5px;
+    width : 410px;
+    height: 250px;
+    border : 1px solid #999;
+    background-color: #F6EFEF;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+#goContent #contentBox {
+    display: table;
+    box-shadow: 0 0 3px gray;
+    margin: 10px auto;
+}
+
+#gamesInfo table{
+    box-sizing: border-box;
+    border-collapse: collapse;
+    width : 370px;
+    margin: 0 auto;
+    background-color: white;
+}
+
+#gamesInfo table td{
+    cursor: default;
+    height: 1.8em;
+    text-align: center;
+    border : 1px solid #999;
+}
+
+#gamesInfo #threeInfo{
+    background-color: white;
+    box-sizing: border-box;
+    border : 1px solid #999;
+    border-top: none;
+    width : 370px;
+    height: 180px;
+    margin: auto;
+}
+
+#gamesInfo #threeInfo #win5,
+#gamesInfo #threeInfo #win5info {
+    position: relative;
+    box-sizing: border-box;
+    float: left;
+    width : 160px;
+    height: 176px;
+    margin: 1px;
+}
+
+#gamesInfo #threeInfo #win5info ul{
+    position: absolute;
+    left: 50px;
+    top : 25px;
+}
+
+#gamesInfo #threeInfo #win5 ul{
+    z-index: 20;
+    position: absolute;
+    padding-left: 15px;
+    padding-top: 5px;
+    width : 110px;
+    height: 120px;
+    left: 40px;
+    top : 20px;
+    border : 1px solid #ddd;
+    border-radius: 3px;
+}
+
+#gamesInfo #threeInfo #win5 span{
+    z-index: 21;
+    color : #888;
+    position: absolute;
+    display: inline-block;
+    padding: 0 3px;
+    left: 50px;
+    top : 11px;
+    background-color: white;
+}
+
+#gamesInfo #threeInfo #win5 ul li,
+#gamesInfo #threeInfo #win5info ul li
+{
+    list-style: none;
+    margin : 5px 0;
+}
+
+#gamesInfo #infoBT{
+    margin-top: 6px;
+    text-align: center;
+    position: relative;
+    height: 38px;
+}
+
+/*-----------about-------------*/
+
+#about_box{
+    display: none;
+    font-size: 0.8em;
+    z-index: 15;
+    position: absolute;
+    border : 1px solid gray;
+    background-color: #E3E9EB;
+    border-radius: 5px;
+    box-shadow: 0 0 10px #777;
+    border : 1px solid #888;
+}
+
+#about_box #about_title{
+    box-sizing: border-box;
+    margin: 5px 5px 0 5px;
+    cursor: default;
+    padding-left: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width : 300px;
+    height: 25px;
+    border : 1px solid #AAA4A4;
+    border-bottom: none;
+    background : linear-gradient(to bottom, #F0F0F0, #DDD);
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    user-select:none;
+    -webkit-user-select: none;
+}
+
+#about_box #about_content{
+    box-sizing: border-box;
+    padding: 1em;
+    background-color: #F8F4F4;    
+    margin: 0 5px 5px 5px;
+    color : #333;
+    width : 300px;
+    height: 200px;
+    border-top: none;
+    border : 1px solid gray;
+    overflow: auto;
+}
+
+
+.xicon3{
+    margin-right: 5px;
+    border-collapse: separate;
+    border-spacing: 2px;
+}
+
+.xicon{
+    box-sizing: border-box;
+    display: table-cell;
+    width : 14px;
+    height: 14px;
+    border-radius: 3px;
+}
+
+.xicon:nth-of-type(1) {
+    background-color: #59C73B;
+}
+
+.xicon:nth-of-type(2) {
+    background-color: #E2A127;
+}
+
+.xicon:nth-of-type(3) {
+    background-color: #E25E69;
+}
+
+.xicon:nth-of-type(3):hover{
+    background-color: #C53742;
+}
