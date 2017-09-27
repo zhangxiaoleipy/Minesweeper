@@ -1,0 +1,121 @@
+﻿<!doctype html>
+<html>
+
+<head>
+    <title>Minesweeper</title>
+    <link rel="stylesheet" type="text/css" href="CSS.css" />
+</head>
+
+<body>
+    <div id="minesweeper">
+        <div id="nav">
+            <span>Minesweeper</span>
+            <div class="xicon3">
+                <span class="xicon" id="mine_close"></span><span class="xicon"></span><span class="xicon"></span>
+            </div>
+        </div>
+        <div id="container">
+            <div id="setting">
+                <div id="setList">
+                    <ul>
+                        <li id="restart">重新开始</li>
+                        <li>难度<i class="spot"></i>
+                            <ul>
+                                <li id="normal">初级</li>
+                                <li id="middle">中级</li>
+                                <li id="hard">高级</li>
+                            </ul>
+                        </li>
+                        <li>外观<i class="spot"></i>
+                            <ul>
+                                <li id="bluebg">天际蓝</li>
+                                <li id="redbg">典雅红</li>
+                                <li id="greenbg">青草绿</li>
+                            </ul>
+                        </li>
+                        <li id="STTInfo">统计信息</li>
+                        <li id="about">关于</li>
+                    </ul>
+                </div>
+            </div>
+            <div id="topTools">
+                <div class="toolBox"><span class="label">TIME</span><br><span id="timer">0</span></div>
+                <div class="toolBox"><span class="label">BOMBS</span><br><span id="mineNum">&nbsp</span></div>
+            </div>
+            <div id="winInfo">
+                <div id="winContent">
+                    <span>赢了！<br>用时 ： <span id="spendTime"></span> 秒</span>
+                </div>
+                <div id="winInfoBT">关 闭</div>
+            </div>
+            <table id="desk"></table>
+        </div>
+    </div>
+
+    <div id="gamesInfo">
+        <div id="top">
+            <span>统计信息</span>
+            <div class="xicon3">
+                <span class="xicon"></span><span class="xicon"></span><span  id="close" class="xicon"></span>
+            </div>
+        </div>
+        <div id="goContent">
+            <div id="contentBox">
+                <table>
+                    <tr>
+                        <td id="selectNormal">初级</td>
+                        <td id="selectMiddle">中级</td>
+                        <td id="selectHard">高级</td>
+                    </tr>
+                </table>
+                <div id="threeInfo">
+                    <div id="win5">
+                        <span>最佳成绩</span>
+                        <ul>
+                            <li></li>
+                            <li></li>
+                            <li></li>
+                            <li></li>
+                            <li></li>
+                        </ul>
+                    </div>
+                    <div id="win5info">
+                        <ul>
+                            <li>已玩游戏：<span></span></li>
+                            <li>已胜游戏：<span></span></li>
+                            <li>获胜率：<span></span></li>
+                            <li>最多连胜：<span></span></li>
+                            <li>最多连败：<span></span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="about_box">
+        <div id="about_title">
+            <span>关于</span>
+            <div class="xicon3">
+                <span class="xicon"></span><span class="xicon"></span><span id="about_close" class="xicon"></span>
+            </div>
+        </div>
+        <div id="about_content">
+            <p>仅在内核为Chrominum53.0.2785.104的QQ浏览器9.6.4上测试运行正常。（i3-2370, 4G）</p>
+            <br/>
+            <p>在最新版64位火狐浏览器上表格内元素td显示有问题，且在低配的电脑上（i3-2370, 4G）存在严重的性能问题。其他浏览器未测试。</p>
+            <br/>
+            <hr/>
+            <br/>
+            <p>作者：<a style="color : #333" target="_blank" href="http://weibo.com/333199500">@张晓雷</a></p>
+            <br/>
+            <p>邮箱 : zhangxiaolei@outlook.com</p>
+        </div>
+    </div>
+
+
+    <script src="include/func_file.js"></script>
+    <script src="include/log001.js"></script>
+    <script src="JSRun.js"></script>
+</body>
+
+</html>
