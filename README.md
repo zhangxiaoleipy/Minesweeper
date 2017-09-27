@@ -2,7 +2,9 @@
 
 业余学习前端，使用原生的HTML + CSS + JavaScript做了一个扫雷游戏，功能和windows自带的扫雷游戏一致。
 
-![pic001](https://github.com/zhangxiaoleipy/Minesweeper/Screenshots/pic001.PNG)
+![pic001](https://github.com/zhangxiaoleipy/Minesweeper/blob/master/Screenshots/pic001.PNG)
+
+
 
 * 支持双键操作
 * 如果一片是空白，将自动打开一片
