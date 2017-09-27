@@ -1,4 +1,10 @@
 ﻿
+/*
+ * 作者：张晓雷
+ * 微博：weibo.com/333199500
+ * 邮箱：zhangxiaolei@outlook.com
+*/
+
 (function (document) {
 
 
