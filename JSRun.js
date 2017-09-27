@@ -1050,72 +1050,10 @@
         about_box.style.display = "none";
     })
 
-    //让dom具有移动功能的函数
-
-    function moveElement(select, moveBody) {
-
-        select = document.querySelector(select);
-        moveBody = document.querySelector(moveBody);
-
-        if (!select || !moveBody) {
-            console.error("[moveElement]:error");
-            return;
-        }
-
-        //moveBody.style.position = "absolute";
-
-        var stX, stY, mouseDown = false;
-
-        select.addEventListener("mousedown", function (e) {
-            stX = e.offsetX;
-            stY = e.offsetY;
-            mouseDown = true;
-        })
-
-        document.addEventListener("mousemove", function (e) {
-            if (mouseDown) {
-                moveBody.style.left = e.clientX - stX + "px";
-                moveBody.style.top = e.clientY - stY + "px";
-            }
-        }, false)
-
-        document.addEventListener("mouseup", function () {
-            mouseDown = false;
-        }, false)
-    }
-
 
     //让窗口具有移动功能
     moveElement("#nav", "#minesweeper");
     moveElement("#gamesInfo #top", "#gamesInfo");
     moveElement("#about_title", "#about_box");
-
-    //计时器
-
-    function createTimer(id) {
-        this.id = document.querySelector(id);
-        this.additive = 0;
-        this.start = function () {
-            //扫雷点击开始直接从1秒开始计时
-            this.additive += 1;
-            this.id.innerText = this.additive;
-            this.itv = function () {
-                this.additive += 1;
-                this.id.innerText = this.additive;
-            };
-            this.timerStop = setInterval(this.itv.bind(this),1000);
-        };
-        this.stop = function () {
-            clearInterval(this.timerStop);
-        };
-        this.reset = function () {
-            clearInterval(this.timerStop);
-            this.id.innerText = 0;
-            this.additive = 0;
-        };
-        this.getTime = function () {
-            return this.additive;
-        }
-    }
 
 })(document);
