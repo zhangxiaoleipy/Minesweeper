@@ -307,6 +307,8 @@
                 if (event.buttons === 1) {
 
                     if (!this.start) {
+                        //如果游戏第一次点击，触发时间计时
+                        //获取当前坐标，开始布雷
                         this.timer.start();
                         this.restart(this.level, y, x);
                         this.end = false;

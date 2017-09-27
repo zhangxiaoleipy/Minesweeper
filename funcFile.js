@@ -6,15 +6,16 @@ function createTimer(id) {
     this.id = document.querySelector(id);
     var addTime = 0;
     var timerStop;
+    var itv = function () {
+        addTime += 1;
+        this.id.innerText = addTime;
+    };
+    
     //开始计时
     this.start = function () {
         //扫雷点击开始直接从1秒开始计时
         addTime += 1;
         this.id.innerText = addTime;
-        var itv = function () {
-            addTime += 1;
-            this.id.innerText = addTime;
-        };
         timerStop = setInterval(itv.bind(this), 1000);
     };
     //时间停止
