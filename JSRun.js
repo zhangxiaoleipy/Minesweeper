@@ -1,7 +1,6 @@
 ﻿
 (function (document) {
 
-
     //屏蔽右键
     document.querySelector("#minesweeper").oncontextmenu = function (e) {
         e.preventDefault();
@@ -20,7 +19,7 @@
         },
     };
 
-    //主体对象
+    //主要对象
     function msp(id) {
 
         this.id = id;
@@ -1085,7 +1084,6 @@
     moveElement("#about_title", "#about_box");
 
     //计时器
-
     function createTimer(id) {
         this.id = document.querySelector(id);
         this.additive = 0;
