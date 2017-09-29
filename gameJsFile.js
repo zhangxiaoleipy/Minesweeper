@@ -154,7 +154,7 @@
     //给一个坐标，返回周围八个坐标
     msp.prototype.getAround = function (y, x) {
         var a = [];
-        this.check(y - 1, x - 1) && a.push([y-1, x - 1])
+        this.check(y - 1, x - 1) && a.push([y - 1, x - 1])
         this.check(y - 1, x) && a.push([y - 1, x])
         this.check(y - 1, x + 1) && a.push([y - 1, x + 1])
         this.check(y, x + 1) && a.push([y, x + 1])
@@ -254,7 +254,7 @@
 
         var y, x;
 
-        while (n--) {
+        while (n) {
 
             y = random.randint(0, this.lineY - 1);
             x = random.randint(0, this.lineX - 1);
@@ -271,6 +271,7 @@
             if (!(this.box[y][x].has)) {
                 this.box[y][x].has = 1;
                 this.box[y][x].mark = 1;
+                n -= 1;
             }
         }
     }
