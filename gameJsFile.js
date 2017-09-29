@@ -7,12 +7,88 @@
 
 (function (document) {
 
-
     //屏蔽右键
     document.querySelector("#minesweeper").oncontextmenu = function (e) {
         e.preventDefault();
     }
 
+    //计时器构造函数
+  
+    function createTimer(id) {
+        this.id = document.querySelector(id);
+        var addTime = 0;
+        var timerStop;
+        var itv = function () {
+            addTime += 1;
+            this.id.innerText = addTime;
+        };
+
+        //开始计时
+        this.start = function () {
+            //扫雷点击开始直接从1秒开始计时
+            addTime += 1;
+            this.id.innerText = addTime;
+            timerStop = setInterval(itv.bind(this), 1000);
+        };
+        //时间停止
+        this.stop = function () {
+            clearInterval(timerStop);
+        };
+        //初始化计时
+        this.reset = function () {
+            clearInterval(timerStop);
+            this.id.innerText = 0;
+            addTime = 0;
+        };
+        //获取时间
+        this.getTime = function () {
+            return addTime;
+        }
+    }
+
+    //让DOM元素具有移动能力
+    function moveElement(select, moveBody) {
+
+        select = document.querySelector(select);
+        moveBody = document.querySelector(moveBody);
+
+        if (!select || !moveBody) {
+            console.error("[moveElement]:error");
+            return;
+        }
+
+        //moveBody.style.position = "absolute";
+
+        var stX, stY, mouseDown = false;
+
+        select.addEventListener("mousedown", function (e) {
+            stX = e.offsetX;
+            stY = e.offsetY;
+            mouseDown = true;
+        })
+
+        document.addEventListener("mousemove", function (e) {
+            if (mouseDown) {
+                moveBody.style.left = e.clientX - stX + "px";
+                moveBody.style.top = e.clientY - stY + "px";
+            }
+        }, false)
+
+        document.addEventListener("mouseup", function () {
+            mouseDown = false;
+        }, false)
+    }
+
+    //判断一个数组是否在另一个数组内
+    function haveArr(arr, arrlist) {
+        for (var item of arrlist) {
+            if (arr.toString() === item.toString()) {
+                return true;
+            }
+        }
+    }
+
+    
     //随机对象
     var random = {
         random: function () {
@@ -73,6 +149,20 @@
         } else {
             return false;
         }
+    }
+
+    //给一个坐标，返回周围八个坐标
+    msp.prototype.getAround = function (y, x) {
+        var a = [];
+        this.check(y - 1, x - 1) && a.push([y-1, x - 1])
+        this.check(y - 1, x) && a.push([y - 1, x])
+        this.check(y - 1, x + 1) && a.push([y - 1, x + 1])
+        this.check(y, x + 1) && a.push([y, x + 1])
+        this.check(y + 1, x + 1) && a.push([y + 1, x + 1])
+        this.check(y + 1, x) && a.push([y + 1, x])
+        this.check(y + 1, x - 1) && a.push([y + 1, x - 1])
+        this.check(y, x - 1) && a.push([y, x - 1])
+        return a;
     }
 
     //创建桌面，生成对象
@@ -157,32 +247,30 @@
 
 
     //设置地雷
-    msp.prototype.settleBombs = function (n, notY, notX) {
+    msp.prototype.settleBombs = function (n, ny, nx) {
+        
+        var notList = this.getAround(ny, nx);
+        notList.push([ny, nx]);
+
         var y, x;
 
-        while (n) {
+        while (n--) {
+
             y = random.randint(0, this.lineY - 1);
             x = random.randint(0, this.lineX - 1);
 
             while (true) {
-                if (y === notY) {
+                if (haveArr([y, x], notList)) {
                     y = random.randint(0, this.lineY - 1);
-                } else {
-                    break;
-                }
-            }
-
-            while (true) {
-                if (x === notX) {
                     x = random.randint(0, this.lineX - 1);
                 } else {
                     break;
                 }
             }
+
             if (!(this.box[y][x].has)) {
                 this.box[y][x].has = 1;
                 this.box[y][x].mark = 1;
-                n--;
             }
         }
     }
@@ -192,17 +280,12 @@
         var sum = 0;
         for (var y = 0; y < this.lineY; y++) {
             for (var x = 0; x < this.lineX; x++) {
-                sum = (this.check(y - 1, x - 1) ? this.box[y - 1][x - 1].has : 0) +
-                    (this.check(y - 1, x) ? this.box[y - 1][x].has : 0) +
-                    (this.check(y - 1, x + 1) ? this.box[y - 1][x + 1].has : 0) +
-                    (this.check(y, x + 1) ? this.box[y][x + 1].has : 0) +
-                    (this.check(y + 1, x + 1) ? this.box[y + 1][x + 1].has : 0) +
-                    (this.check(y + 1, x) ? this.box[y + 1][x].has : 0) +
-                    (this.check(y + 1, x - 1) ? this.box[y + 1][x - 1].has : 0) +
-                    (this.check(y, x - 1) ? this.box[y][x - 1].has : 0);
-
+                this.getAround(y,x).forEach( (p)=> {
+                    sum += this.box[p[0]][p[1]].has;
+                })
                 this.box[y][x].clue = sum > 0 ? sum : "";
                 this.box[y][x].mark = sum > 0 ? 2 : 0;
+                sum = 0;
             }
         }
     }
@@ -372,46 +455,11 @@
                     var sum = 0;
 
                     var swep8 = [];
-
-                    if (this.check(y - 1, x - 1)) {
-                        sum += this.box[y - 1][x - 1].swep;
-                        swep8.push(this.box[y - 1][x - 1])
-                    }
-
-                    if (this.check(y - 1, x)) {
-                        sum += this.box[y - 1][x].swep;
-                        swep8.push(this.box[y - 1][x])
-                    }
-
-                    if (this.check(y - 1, x + 1)) {
-                        sum += this.box[y - 1][x + 1].swep;
-                        swep8.push(this.box[y - 1][x + 1])
-                    }
-
-                    if (this.check(y, x + 1)) {
-                        sum += this.box[y][x + 1].swep;
-                        swep8.push(this.box[y][x + 1])
-                    }
-
-                    if (this.check(y + 1, x + 1)) {
-                        sum += this.box[y + 1][x + 1].swep;
-                        swep8.push(this.box[y + 1][x + 1]);
-                    }
-
-                    if (this.check(y + 1, x)) {
-                        sum += this.box[y + 1][x].swep;
-                        swep8.push(this.box[y + 1][x]);
-                    }
-
-                    if (this.check(y + 1, x - 1)) {
-                        sum += this.box[y + 1][x - 1].swep;
-                        swep8.push(this.box[y + 1][x - 1]);
-                    }
-
-                    if (this.check(y, x - 1)) {
-                        sum += this.box[y][x - 1].swep;
-                        swep8.push(this.box[y][x - 1]);
-                    }
+                    //获取周围雷的信息
+                    this.getAround(y,x).forEach( (p) => {
+                        sum += this.box[p[0]][p[1]].swep;
+                        swep8.push(this.box[p[0]][p[1]])
+                    })
 
                     //如果标注的红旗和提示信息数量一致
                     if (sum === this.box[y][x].clue) {
@@ -456,26 +504,8 @@
             for (var y = 0; y < this.lineY; y++) {
                 for (var x = 0; x < this.lineX; x++) {
                     if (this.box[y][x].mark === 3) {
-                        if (this.check(y - 1, x)) {
-                            with (this.box[y - 1][x]) {
-                                if (mark === 0) {
-                                    this.cubeDisplay(el, "op");
-                                    mark = 3;
-                                    done = 1;
-                                    sum++;
-                                } else if (mark == 2) {
-                                    this.cubeDisplay(el, "op");
-                                    //el.clue保存的是页面的clue元素
-                                    //clue是对象内保存的提示数字
-                                    //只有页面打开的时候，数字才会传递，杜绝了通过查看页面元素而作弊的可能。
-                                    el.clue.innerText = clue;
-                                    done = 1;
-                                }
-                            }
-                        }
-
-                        if (this.check(y, x + 1)) {
-                            with (this.box[y][x + 1]) {
+                        this.getAround(y,x).forEach( (p) => {
+                            with(this.box[p[0]][p[1]]){
                                 if (mark === 0) {
                                     this.cubeDisplay(el, "op");
                                     mark = 3;
@@ -487,97 +517,7 @@
                                     done = 1;
                                 }
                             }
-                        }
-
-                        if (this.check(y + 1, x)) {
-                            with (this.box[y + 1][x]) {
-                                if (mark === 0) {
-                                    this.cubeDisplay(el, "op");
-                                    mark = 3;
-                                    done = 1;
-                                    sum++;
-                                } else if (mark === 2) {
-                                    this.cubeDisplay(el, "op");
-                                    el.clue.innerText = clue;
-                                    done = 1;
-                                }
-                            }
-                        }
-
-                        if (this.check(y, x - 1)) {
-                            with (this.box[y][x - 1]) {
-                                if (mark === 0) {
-                                    this.cubeDisplay(el, "op");
-                                    mark = 3;
-                                    done = 1;
-                                    sum++;
-                                } else if (mark === 2) {
-                                    this.cubeDisplay(el, "op");
-                                    el.clue.innerText = clue;
-                                    done = 1;
-                                }
-                            }
-                        }
-
-                        if (this.check(y - 1, x - 1)) {
-                            with (this.box[y - 1][x - 1]) {
-                                if (mark === 0) {
-                                    this.cubeDisplay(el, "op");
-                                    mark = 3;
-                                    done = 1;
-                                    sum++;
-                                } else if (mark === 2) {
-                                    this.cubeDisplay(el, "op");
-                                    el.clue.innerText = clue;
-                                    done = 1;
-                                }
-                            }
-                        }
-
-                        if (this.check(y - 1, x + 1)) {
-                            with (this.box[y - 1][x + 1]) {
-                                if (mark === 0) {
-                                    this.cubeDisplay(el, "op");
-                                    mark = 3;
-                                    done = 1;
-                                    sum++;
-                                } else if (mark === 2) {
-                                    this.cubeDisplay(el, "op");
-                                    el.clue.innerText = clue;
-                                    done = 1;
-                                }
-                            }
-                        }
-
-                        if (this.check(y + 1, x + 1)) {
-                            with (this.box[y + 1][x + 1]) {
-                                if (mark === 0) {
-                                    this.cubeDisplay(el, "op");
-                                    mark = 3;
-                                    done = 1;
-                                    sum++;
-                                } else if (mark === 2) {
-                                    this.cubeDisplay(el, "op");
-                                    el.clue.innerText = clue;
-                                    done = 1;
-                                }
-                            }
-                        }
-
-                        if (this.check(y + 1, x - 1)) {
-                            with (this.box[y + 1][x - 1]) {
-                                if (mark === 0) {
-                                    this.cubeDisplay(el, "op");
-                                    mark = 3;
-                                    done = 1;
-                                    sum++;
-                                } else if (mark === 2) {
-                                    this.cubeDisplay(el, "op");
-                                    el.clue.innerText = clue;
-                                    done = 1;
-                                }
-                            }
-                        }
+                        })
                     }
                 }
             }
@@ -589,7 +529,7 @@
 
     //检查游戏是否赢了
     msp.prototype.checkWin = function () {
-   
+
         for (var y = 0; y < this.lineY; y++) {
             for (var x = 0; x < this.lineX; x++) {
                 if (!this.box[y][x].done) {
@@ -638,7 +578,7 @@
             initGame.hardSucLost = 0;
             initGame.hardBest.push(this.timer.getTime() + " : " + new Date().getTime());
             initGame.hardBest.sort(sortControl);
-            if(initGame.hardBest.length > 5) {
+            if (initGame.hardBest.length > 5) {
                 initGame.hardBest.pop();
             }
         }
