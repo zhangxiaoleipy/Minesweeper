@@ -248,25 +248,14 @@
 
     //设置地雷
     msp.prototype.settleBombs = function (n, ny, nx) {
-        
         var notList = this.getAround(ny, nx);
         notList.push([ny, nx]);
-
         var y, x;
-
         while (n) {
-
-            y = random.randint(0, this.lineY - 1);
-            x = random.randint(0, this.lineX - 1);
-
-            while (true) {
-                if (haveArr([y, x], notList)) {
-                    y = random.randint(0, this.lineY - 1);
-                    x = random.randint(0, this.lineX - 1);
-                } else {
-                    break;
-                }
-            }
+            do {
+                y = random.randint(0, this.lineY - 1);
+                x = random.randint(0, this.lineX - 1);
+            } while (haveArr([y,x], notList));
 
             if (!(this.box[y][x].has)) {
                 this.box[y][x].has = 1;
@@ -430,7 +419,7 @@
                                 this.cubeDisplay(el, "mk");
                                 bombsNum.innerText = parseInt(bombsNum.innerText) - 1;
                                 swep = 1;
-                                done = 1;
+                                has && ( done = 1 );
                                 select = 1;
                             }
                         }
