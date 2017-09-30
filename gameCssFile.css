@@ -104,9 +104,9 @@ body{
     top : 1px;
     left : 6px;
     content: "";
-    border-left: 1px solid #333;
+    border-left: 1px solid #000;
     height: 16px;
-    box-shadow: 1px 1px 1px gray;
+    box-shadow: 1px 2px 1px #555;
 }
 
 #desk tr td .cover .coverMiddle:after{
@@ -114,10 +114,10 @@ body{
     content: "";
     top : 1px;
     left: 7px;
-    border-top : 8px solid #C20E0E;
+    border-top : 8px solid #E91212;
     border-top-right-radius: 4px;
     width : 8px;
-    box-shadow: 1px 2px 1px gray;
+    box-shadow: 1px 2px 1px #555;
 }
 
 #desk tr td .cover .coverBottom{
@@ -150,7 +150,7 @@ body{
     width : 100%;
     height: 100%;
     z-index: 6;
-    background-color: rgb(206,215,231);
+    background-color: rgb(210,210,210);
 }
 
 #desk tr td .mine .mineMine{
@@ -189,7 +189,7 @@ body{
     width : 100%;
     height: 100%;
     z-index: 4;
-    background-color: rgb(139, 193, 147);
+    background-color: rgb(210,210,210);
 }
 
 /*----------------------------------------------*/

@@ -311,25 +311,23 @@
             initGame.normalNum += 1;
             initGame.normalSucWin = 0;
             initGame.normalSucLost += 1;
-            initGame.normalSucLostSave = initGame.normalSucLost > initGame.normalSucLostSave ?
-                initGame.normalSucLost :
-                initGame.normalSucLostSave;
-
+            if ( initGame.normalSucLost > initGame.normalSucLostSave ) {
+                initGame.normalSucLostSave = initGame.normalSucLost
+            }
         } else if (mx.level === 2) {
             initGame.middleNum += 1;
             initGame.middleSucWin = 0;
             initGame.middleSucLost += 1;
-            initGame.middleSucLostSave = initGame.middleSucLost > initGame.middleSucLostSave ?
-                initGame.middleSucLost :
-                initGame.middleSucLostSave;
-
+            if ( initGame.middleSucLost > initGame.middleSucLostSave ) {
+                initGame.middleSucLostSave = initGame.middleSucLost
+            }
         } else if (mx.level === 3) {
             initGame.hardNum += 1;
             initGame.hardSucWin = 0;
             initGame.hardSucLost += 1;
-            initGame.hardSucLostSave = initGame.hardSucLost > initGame.hardSucLostSave ?
-                initGame.hardSucLost :
-                initGame.hardSucLostSave;
+            if ( initGame.hardSucLost > initGame.hardSucLostSave ) {
+                initGame.hardSucLostSave = initGame.hardSucLost
+            }
         }
 
         saveGameData();
@@ -472,7 +470,7 @@
                     } else {
                         for (var item of swep8) {
                             if (!this.box[item.y][item.x].done) {
-                                this.box[item.y][item.x].el.td.style.opacity = "0.5";
+                                this.box[item.y][item.x].el.td.style.opacity = "0.3";
                                 save8.push(this.box[item.y][item.x].el.td)
                             }
                         }
@@ -534,9 +532,9 @@
             initGame.normalNum += 1;
             initGame.normalWin += 1;
             initGame.normalSucWin += 1;
-            initGame.normalSucWinSave = initGame.normalSucWin > initGame.normalSucWinSave ?
-                initGame.normalSucWin :
-                initGame.normalSucWinSave;
+            if (initGame.normalSucWin > initGame.normalSucWinSave ) {
+                initGame.normalSucWinSave = initGame.normalSucWin;
+            }
             initGame.normalSucLost = 0;
             initGame.normalBest.push(this.timer.getTime() + " : " + new Date().getTime());
             initGame.normalBest.sort(sortControl);
@@ -548,9 +546,9 @@
             initGame.middleNum += 1;
             initGame.middleWin += 1;
             initGame.middleSucWin += 1;
-            initGame.middleSucWinSave = initGame.middleSucWin > initGame.middleSucWinSave ?
-                initGame.middleSucWin :
-                initGame.middleSucWinSave;
+            if (initGame.middleSucWin > initGame.middleSucWinSave ) {
+                initGame.middleSucWinSave = initGame.middleSucWin;
+            }
             initGame.middleSucLost = 0;
             initGame.middleBest.push(this.timer.getTime() + " : " + new Date().getTime());
             initGame.middleBest.sort(sortControl);
@@ -562,9 +560,9 @@
             initGame.hardNum += 1;
             initGame.hardWin += 1;
             initGame.hardSucWin += 1;
-            initGame.hardSucWinSave = initGame.hardSucWin > initGame.hardSucWinSave ?
-                initGame.hardSucWin :
-                initGame.hardSucWinSave;
+            if (initGame.hardSucWin > initGame.hardSucWinSave ) {
+                initGame.hardSucWinSave = initGame.hardSucWin;
+            }
             initGame.hardSucLost = 0;
             initGame.hardBest.push(this.timer.getTime() + " : " + new Date().getTime());
             initGame.hardBest.sort(sortControl);
@@ -930,39 +928,44 @@
     })
 
     //-------------------颜色更改--------------------
+    var bgColor = Object.create(null);
+    bgColor.blue = "rgb(60,130,200)";
+    bgColor.green = "rgb(100,180,120)";
+    bgColor.red = "rgb(230,110,155)";
+
     mx.event(mx.qs("#bluebg"), "click", function () {
         for (var y = 0; y < this.lineY; y++) {
             for (var x = 0; x < this.lineX; x++) {
-                this.box[y][x].el.coverTop.style.backgroundColor = "rgb(60,130,200)";
-                this.box[y][x].el.coverBottom.style.backgroundColor = "rgb(60,130,200)";
+                this.box[y][x].el.coverTop.style.backgroundColor = bgColor.blue;
+                this.box[y][x].el.coverBottom.style.backgroundColor = bgColor.blue;
             }
         }
         setList.style.display = "none";
-        initGame.startColorBG.cover = "rgb(60,130,200)";
+        initGame.startColorBG.cover = bgColor.blue;
         saveGameData();
     })
 
     mx.event(mx.qs("#greenbg"), "click", function () {
         for (var y = 0; y < this.lineY; y++) {
             for (var x = 0; x < this.lineX; x++) {
-                this.box[y][x].el.coverTop.style.backgroundColor = "rgb(100,180,120)";
-                this.box[y][x].el.coverBottom.style.backgroundColor = "rgb(100,180,120)";
+                this.box[y][x].el.coverTop.style.backgroundColor = bgColor.green;
+                this.box[y][x].el.coverBottom.style.backgroundColor = bgColor.green;
             }
         }
         setList.style.display = "none";
-        initGame.startColorBG.cover = "rgb(100,180,120)";
+        initGame.startColorBG.cover = bgColor.green;
         saveGameData();
     })
 
     mx.event(mx.qs("#redbg"), "click", function () {
         for (var y = 0; y < this.lineY; y++) {
             for (var x = 0; x < this.lineX; x++) {
-                this.box[y][x].el.coverTop.style.backgroundColor = "rgb(230,110,155)";
-                this.box[y][x].el.coverBottom.style.backgroundColor = "rgb(230,110,155)";
+                this.box[y][x].el.coverTop.style.backgroundColor = bgColor.red;
+                this.box[y][x].el.coverBottom.style.backgroundColor = bgColor.red;
             }
         }
         setList.style.display = "none";
-        initGame.startColorBG.cover = "rgb(230,110,155)";
+        initGame.startColorBG.cover = bgColor.red;
         saveGameData();
     })
 
