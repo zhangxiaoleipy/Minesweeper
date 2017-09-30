@@ -468,7 +468,7 @@
                         this.uncoverEmpty();
                     } else {
                         for (var item of swep8) {
-                            if (!this.box[item.y][item.x].done) {
+                            if (!this.box[item.y][item.x].done && this.box[item.y][item.x].swep !== 1 ) {
                                 this.box[item.y][item.x].el.td.style.opacity = "0.3";
                                 save8.push(this.box[item.y][item.x].el.td)
                             }
