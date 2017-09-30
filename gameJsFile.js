@@ -273,7 +273,7 @@
                 this.getAround(y,x).forEach( (p)=> {
                     sum += this.box[p[0]][p[1]].has;
                 })
-                this.box[y][x].clue = sum > 0 ? sum : "";
+                this.box[y][x].clue = sum;
                 this.box[y][x].mark = sum > 0 ? 2 : 0;
                 sum = 0;
             }
@@ -456,9 +456,8 @@
                                 if (!has) {
                                     done = 1;
                                     if (mark === 0) mark = 3;
-                                    el.td.style.opacity = "1";
                                     this.cubeDisplay(el, "op");
-                                    el.clue.innerText = clue;
+                                    if (clue) el.clue.innerText = clue;
                                 } else {
                                     if (!(swep === 1)) {
                                         this.bombs();
