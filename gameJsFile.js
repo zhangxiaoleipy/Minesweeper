@@ -7,8 +7,12 @@
 
 (function (document) {
 
+    "use strict";
+    
+    var log = console.log;
+
     //屏蔽右键
-    document.querySelector("#minesweeper").oncontextmenu = function (e) {
+    document.querySelectorAll(".window")[0].oncontextmenu = function (e) {
         e.preventDefault();
     }
 
@@ -186,6 +190,9 @@
             this.box[y] = Object.create(null);
             for (var x = 0; x < this.lineX; x++) {
                 td = this.c("td");
+                //td是一个对象，在对象下新建一个属性cubeLoc用来存储坐标
+                td.squareCoords = [y,x];
+
                 this.box[y][x] = Object.create(null);
                 //td
                 this.table.push(td);
@@ -362,9 +369,12 @@
         this.table.forEach((td) => {
             //this.table是一个数组，存放所有的td
             //通过td的dataset属性获取当前元素坐标
-            var loc = td.dataset.loc;
-            var y = parseInt(loc.slice(0, loc.indexOf(":")));
-            var x = parseInt(loc.slice(loc.indexOf(":") + 1));
+            // var loc = td.dataset.loc;
+            //var y = parseInt(loc.slice(0, loc.indexOf(":")));
+            //var x = parseInt(loc.slice(loc.indexOf(":") + 1));
+            var y = td.squareCoords[0];
+            var x = td.squareCoords[1];
+            var squareBox = this.box[y][x];
 
             //this.event方法会修该绑定方法的this，改为对象的this
             this.event(td, "mousedown", function (event) {
@@ -374,6 +384,7 @@
                     return;
                 }
 
+                
                 //左键
                 if (event.buttons === 1) {
 
@@ -388,60 +399,54 @@
                     this.start = true;
 
                     //确保方块还未动作
-                    if (this.box[y][x].swep !== 1) {
+                    if (squareBox !== 1) {
                         //直接触雷
-                        if (this.box[y][x].has) {
+                        if (squareBox.has) {
                             this.bombs();
 
                         } else {
                             //点击的位置有信息
-                            if (this.box[y][x].mark === 2) {
-                                this.cubeDisplay(this.box[y][x].el, "op");
-                                this.box[y][x].el.clue.innerText = this.box[y][x].clue;
-                                this.box[y][x].done = 1;
+                            if (squareBox.mark === 2) {
+                                this.cubeDisplay(squareBox.el, "op");
+                                squareBox.el.clue.innerText = squareBox.clue;
+                                squareBox.done = 1;
                                 this.checkWin();
                             } else {
                                 //什么都没有，启动区域清理
-                                this.cubeDisplay(this.box[y][x].el, "op");
-                                this.box[y][x].mark = 3;
-                                this.box[y][x].done = 1;
+                                this.cubeDisplay(squareBox.el, "op");
+                                squareBox.mark = 3;
+                                squareBox.done = 1;
                                 this.uncoverEmpty();
                             }
                         }
                     }
                 } else if (event.buttons === 2) {
                     //右键
-                    if (this.box[y][x].select === 0) {
-                        with (this.box[y][x]) {
-                            if (!done) {
-                                this.cubeDisplay(el, "mk");
-                                bombsNum.innerText = parseInt(bombsNum.innerText) - 1;
-                                swep = 1;
-                                has && ( done = 1 );
-                                select = 1;
-                            }
+                    if (squareBox.select === 0) {
+                        if (!squareBox.done) {
+                            this.cubeDisplay(squareBox.el, "mk");
+                            bombsNum.innerText = parseInt(bombsNum.innerText) - 1;
+                            squareBox.swep = 1;
+                            squareBox.has && (squareBox.done = 1);
+                            squareBox.select = 1;
                         }
                         this.checkWin();
-                    } else if (this.box[y][x].select === 1) {
-                        with (this.box[y][x]) {
-                            el.coverTop.style.display = "block";
-                            el.coverTop.innerText = "?";
-                            bombsNum.innerText = parseInt(bombsNum.innerText) + 1;
-                            swep = 0;
-                            done = 0;
-                            select = 2;
-                        }
-                    } else if (this.box[y][x].select === 2) {
-                        with (this.box[y][x]) {
-                            el.coverTop.style.display = "block";
-                            el.coverTop.innerText = "";
-                            select = 0;
-                        }
+                    } else if (squareBox.select === 1) {
+                        squareBox.el.coverTop.style.display = "block";
+                        squareBox.el.coverTop.innerText = "?";
+                        bombsNum.innerText = parseInt(bombsNum.innerText) + 1;
+                        squareBox.swep = 0;
+                        squareBox.done = 0;
+                        squareBox.select = 2;
+
+                    } else if (squareBox.select === 2) {
+                        squareBox.el.coverTop.style.display = "block";
+                        squareBox.el.coverTop.innerText = "";
+                        squareBox.select = 0;
                     }
                 } else if (event.buttons === 3) {
                     //双键
                     var sum = 0;
-
                     var swep8 = [];
                     //获取周围雷的信息
                     this.getAround(y,x).forEach( (p) => {
@@ -450,32 +455,30 @@
                     })
 
                     //如果标注的红旗和提示信息数量一致
-                    if (sum === this.box[y][x].clue) {
+                    if (sum ===squareBox.clue) {
                         for (var item of swep8) {
-                            with (this.box[item.y][item.x]) {
-                                if (!has) {
-                                    done = 1;
-                                    if (mark === 0) mark = 3;
-                                    this.cubeDisplay(el, "op");
-                                    if (clue) el.clue.innerText = clue;
-                                } else {
-                                    if (!(swep === 1)) {
-                                        this.bombs();
-                                    }
+                            if (!item.has) {
+                                item.done = 1;
+                                if (item.mark === 0) item.mark = 3;
+                                this.cubeDisplay(item.el, "op");
+                                if (item.clue) item.el.clue.innerText = item.clue;
+                            } else {
+                                if (!(item.swep === 1)) {
+                                    this.bombs();
                                 }
                             }
                         }
                         this.uncoverEmpty();
                     } else {
                         for (var item of swep8) {
-                            if (!this.box[item.y][item.x].done && this.box[item.y][item.x].swep !== 1 ) {
-                                this.box[item.y][item.x].el.td.style.opacity = "0.3";
-                                save8.push(this.box[item.y][item.x].el.td)
+                            if (!item.done && item.swep !== 1 ) {
+                                item.el.td.style.opacity = "0.3";
+                                save8.push(item.el.td)
                             }
                         }
-                        if (this.box[y][x].clue) {
-                            this.box[y][x].el.clueTop.innerText = "╳";
-                            haveX = this.box[y][x].el.clueTop;
+                        if (squareBox.clue) {
+                            squareBox.el.clueTop.innerText = "╳";
+                            haveX =squareBox.el.clueTop;
                         }
                     }
                 }
@@ -487,22 +490,22 @@
     msp.prototype.uncoverEmpty = function () {
         var sum = 0;
         var stop = true;
+        var tmp;
         while (stop) {
             for (var y = 0; y < this.lineY; y++) {
                 for (var x = 0; x < this.lineX; x++) {
                     if (this.box[y][x].mark === 3) {
                         this.getAround(y,x).forEach( (p) => {
-                            with(this.box[p[0]][p[1]]){
-                                if (mark === 0) {
-                                    this.cubeDisplay(el, "op");
-                                    mark = 3;
-                                    done = 1;
-                                    sum++;
-                                } else if (mark === 2) {
-                                    this.cubeDisplay(el, "op");
-                                    el.clue.innerText = clue;
-                                    done = 1;
-                                }
+                            tmp = this.box[p[0]][p[1]];
+                            if (tmp.mark === 0) {
+                                this.cubeDisplay(tmp.el, "op");
+                                tmp.mark = 3;
+                                tmp.done = 1;
+                                sum++;
+                            } else if (tmp.mark === 2) {
+                                this.cubeDisplay(tmp.el, "op");
+                                tmp.el.clue.innerText = tmp.clue;
+                                tmp.done = 1;
                             }
                         })
                     }
@@ -572,7 +575,7 @@
 
         saveGameData();
         this.timer.stop();
-        winBox(this, 12);
+        winBox(this);
     }
 
     //重新开始游戏
@@ -664,31 +667,75 @@
         bombsNum.innerText = 99;
     }
 
-    //-----------------生成动作-------------------
+    //******************生成动作*********************/
     mx.sweeper();
-    //---------------------------------------------
 
-    var setList = mx.qs("#setList");
-    var setting = mx.qs("#setting");
 
-    //----------选项图标动作-----------------------
-    mx.event(setting, "mouseover", function () {
-        setList.style.display = "block";
+    //*************用来保存变量的全局对象**************/
+    var myData = Object.create(null);
+
+    myData.setting = mx.qs("#option");
+    myData.setList = mx.qs("#s-list");
+    
+
+    //******************选项图标动作******************/
+    mx.event(myData.setting, "mouseover", function () {
+        myData.setList.style.display = "block";
     })
 
-    mx.event(setting, "mouseout", function () {
-        setList.style.display = "none";
+    mx.event(myData.setting, "mouseout", function () {
+        myData.setList.style.display = "none";
     })
 
-    mx.event(setList, "mouseout", function () {
-        setList.style.display = "none";
+    mx.event(myData.setList, "mouseout", function () {
+        myData.setList.style.display = "none";
     })
 
-    //----难度选项------
-    //----一般-------
-    mx.event(mx.qs("#normal"), "click", function () {
+
+    //*********************重新开始************************/
+
+    myData.selectRestart = mx.qs("#s-restart");        //重新开始
+
+    mx.event(myData.selectRestart, "click", function () {
+
+        if (this.level === 1) {
+            bombsNum.innerText = 10;
+        } else if (this.level === 2) {
+            bombsNum.innerText = 40;
+        } else if (this.level === 3) {
+            bombsNum.innerText = 99;
+        }
+
         this.timer.reset();
-        setList.style.display = "none";
+        myData.setList.style.display = "none";
+        this.start = false;
+        this.end = false;
+        var tmp;
+        for (var y = 0; y < this.lineY; y++) {
+            for (var x = 0; x < this.lineX; x++) {
+                tmp = this.box[y][x];
+                this.cubeDisplay(tmp.el, "rst");
+                tmp.mark = 0;
+                tmp.swep = 0;
+                tmp.done = 0;
+                tmp.has = 0;
+                tmp.clue = 0;
+                tmp.el.clue.innerText = "";
+                tmp.el.coverTop.innerText = "";
+                tmp.select = 0;
+            }
+        }
+    })
+
+    //******************难度选项***************************/
+
+    myData.selectNormal = mx.qs("#s-normal");      //初级难度选择
+    myData.selectMiddle = mx.qs("#s-middle");      //中级难度选择
+    myData.selectHard = mx.qs("#s-hard");          //高级难度选择
+
+    mx.event(myData.selectNormal, "click", function () {  //初级
+        this.timer.reset();
+        myData.setList.style.display = "none";
         this.start = false;
         this.end = false;
         this.level = 1;
@@ -699,10 +746,10 @@
         this.createDesk(9, 9);
         this.sweeper();
     })
-    //------中等----------
-    mx.event(mx.qs("#middle"), "click", function () {
+  
+    mx.event(myData.selectMiddle, "click", function () {  //中级
         this.timer.reset();
-        setList.style.display = "none";
+        myData.setList.style.display = "none";
         this.start = false;
         this.end = false;
         this.level = 2;
@@ -713,10 +760,10 @@
         this.createDesk(16, 16);
         this.sweeper();
     })
-    //---------困难----------------
-    mx.event(mx.qs("#hard"), "click", function () {
+   
+    mx.event(myData.selectHard, "click", function () {  //高级
         this.timer.reset();
-        setList.style.display = "none";
+        myData.setList.style.display = "none";
         this.start = false;
         this.end = false;
         this.level = 3;
@@ -728,47 +775,155 @@
         this.sweeper();
     })
 
-    //----------重新开始------------------------
-    mx.event(mx.qs("#restart"), "click", function () {
+    //******************颜色选项*********************/
 
-        if (this.level === 1) {
-            bombsNum.innerText = 10;
-        } else if (this.level === 2) {
-            bombsNum.innerText = 40;
-        } else if (this.level === 3) {
-            bombsNum.innerText = 99;
-        }
+    myData.selectBlueBG = mx.qs("#s-blue-bg");     //选择蓝色
+    myData.selectRedBG = mx.qs("#s-red-bg");       //选择红色
+    myData.selectGreenBG = mx.qs("#s-green-bg");   //选择绿色
+    var bgColor = Object.create(null);                  //存储三种颜色
+    bgColor.blue = "rgb(60,130,200)";
+    bgColor.green = "rgb(100,180,120)";
+    bgColor.red = "rgb(230,110,155)";
 
-        this.timer.reset();
-        setList.style.display = "none";
-        this.start = false;
-        this.end = false;
+    mx.event(myData.selectBlueBG, "click", function () {  //蓝色
         for (var y = 0; y < this.lineY; y++) {
             for (var x = 0; x < this.lineX; x++) {
-                with (this.box[y][x]) {
-                    this.cubeDisplay(el, "rst");
-                    mark = 0;
-                    swep = 0;
-                    done = 0;
-                    has = 0;
-                    clue = 0;
-                    el.clue.innerText = "";
-                    el.coverTop.innerText = "";
-                    select = 0;
-                }
+                this.box[y][x].el.coverTop.style.backgroundColor = bgColor.blue;
+                this.box[y][x].el.coverBottom.style.backgroundColor = bgColor.blue;
             }
+        }
+        myData.setList.style.display = "none";
+        initGame.startColorBG.cover = bgColor.blue;
+        saveGameData();
+    })
+
+    mx.event(myData.selectGreenBG, "click", function () {  //绿色
+        for (var y = 0; y < this.lineY; y++) {
+            for (var x = 0; x < this.lineX; x++) {
+                this.box[y][x].el.coverTop.style.backgroundColor = bgColor.green;
+                this.box[y][x].el.coverBottom.style.backgroundColor = bgColor.green;
+            }
+        }
+        myData.setList.style.display = "none";
+        initGame.startColorBG.cover = bgColor.green;
+        saveGameData();
+    })
+
+    mx.event(myData.selectRedBG, "click", function () {  //红色
+        for (var y = 0; y < this.lineY; y++) {
+            for (var x = 0; x < this.lineX; x++) {
+                this.box[y][x].el.coverTop.style.backgroundColor = bgColor.red;
+                this.box[y][x].el.coverBottom.style.backgroundColor = bgColor.red;
+            }
+        }
+        myData.setList.style.display = "none";
+        initGame.startColorBG.cover = bgColor.red;
+        saveGameData();
+    })
+
+    //*********************统计功能区域**********************/
+    myData.selectGamesInfo = mx.qs("#s-games-info");   //选择游戏统计信息选项
+    myData.gamesInfoWindow = mx.qs("#games-info-window");   //游戏统计信息窗口
+    myData.normalInfo = mx.qs("#normal-info");              //初级难度顶栏选项
+    myData.middleInfo = mx.qs("#middle-info");              //中级难度顶栏选项
+    myData.hardInfo = mx.qs("#hard-info");                  //高级难度顶栏选项
+    myData.leftInfo = mx.qsA("#win5 ul li");                //右侧Top5列
+    myData.rightInfo = mx.qsA("#win5info li span");         //左侧记录区域
+
+    mx.event(myData.selectGamesInfo, "click", function () {   //统计信息默认页面
+
+        var top,left;
+        [top, left] = windowLoc(414, 284);
+        myData.gamesInfoWindow.style.top = top + "px";
+        myData.gamesInfoWindow.style.left = left + "px";
+
+        myData.gamesInfoWindow.style.display = "block";
+        myData.setList.style.display = "none";
+        //默认为一般难度
+        myData.normalInfo.style.backgroundColor = "skyblue";
+        myData.middleInfo.style.backgroundColor = "#F6EFEF";
+        myData.hardInfo.style.backgroundColor = "#F6EFEF";
+        //数据开始
+        myData.rightInfo[0].innerText = initGame.normalNum;
+        myData.rightInfo[1].innerText = initGame.normalWin;
+        myData.rightInfo[2].innerText = parseInt((initGame.normalWin / initGame.normalNum || 0) * 100) + "%";
+        myData.rightInfo[3].innerText = initGame.normalSucWinSave;
+        myData.rightInfo[4].innerText = initGame.normalSucLostSave;
+       
+        for (var i = 0; i < initGame.normalBest.length; i++) {
+            myData.leftInfo[i].innerText = formatTime(initGame.normalBest[i]);
         }
     })
 
+    mx.event(myData.normalInfo, "click", function () {      //初级信息
 
-    //--------------------统计功能区域-------------------
+        myData.normalInfo.style.backgroundColor = "skyblue";
+        myData.middleInfo.style.backgroundColor = "#F6EFEF";
+        myData.hardInfo.style.backgroundColor = "#F6EFEF";
 
-    var selectNormal = mx.qs("#selectNormal");
-    var selectMiddle = mx.qs("#selectMiddle");
-    var selectHard = mx.qs("#selectHard");
-    var gamesInfo = mx.qs("#gamesInfo");
-    var leftInfo = mx.qsA("#win5 li", gamesInfo);
-    var rightInfo = mx.qsA("#win5info li span", gamesInfo);
+        myData.rightInfo[0].innerText = initGame.normalNum;
+        myData.rightInfo[1].innerText = initGame.normalWin;
+        myData.rightInfo[2].innerText = parseInt((initGame.normalWin / initGame.normalNum || 0) * 100) + "%";
+        myData.rightInfo[3].innerText = initGame.normalSucWinSave;
+        myData.rightInfo[4].innerText = initGame.normalSucLostSave;
+    
+        for (var j = 0; j < 5; j++) {
+            myData.leftInfo[j].innerText = "";
+        }
+
+        for (var i = 0; i < initGame.normalBest.length; i++) {
+            myData.leftInfo[i].innerText = formatTime(initGame.normalBest[i]);
+        }
+    })
+
+    mx.event(myData.middleInfo, "click", function () {      //中级信息
+
+        myData.normalInfo.style.backgroundColor = "#F6EFEF";
+        myData.middleInfo.style.backgroundColor = "skyblue";
+        myData.hardInfo.style.backgroundColor = "#F6EFEF";
+
+        myData.rightInfo[0].innerText = initGame.middleNum;
+        myData.rightInfo[1].innerText = initGame.middleWin;
+        myData.rightInfo[2].innerText = parseInt((initGame.middleWin / initGame.middleNum || 0) * 100) + "%";
+        myData.rightInfo[3].innerText = initGame.middleSucWinSave;
+        myData.rightInfo[4].innerText = initGame.middleSucLostSave;
+        //----
+
+        for (var j = 0; j < 5; j++) {
+            myData.leftInfo[j].innerText = "";
+        }
+
+        for (var i = 0; i < initGame.middleBest.length; i++) {
+            myData.leftInfo[i].innerText = formatTime(initGame.middleBest[i]);
+        }
+    })
+
+    mx.event(myData.hardInfo, "click", function () {        //高级信息
+
+        myData.normalInfo.style.backgroundColor = "#F6EFEF";
+        myData.middleInfo.style.backgroundColor = "#F6EFEF";
+        myData.hardInfo.style.backgroundColor = "skyblue";
+
+        myData.rightInfo[0].innerText = initGame.hardNum;
+        myData.rightInfo[1].innerText = initGame.hardWin;
+        myData.rightInfo[2].innerText = parseInt((initGame.hardWin / initGame.hardNum || 0) * 100) + "%";
+        myData.rightInfo[3].innerText = initGame.hardSucWinSave;
+        myData.rightInfo[4].innerText = initGame.hardSucLostSave;
+        //-----
+        for (var j = 0; j < 5; j++) {
+            myData.leftInfo[j].innerText = "";
+        }
+
+        for (var i = 0; i < initGame.hardBest.length; i++) {
+            myData.leftInfo[i].innerText = formatTime(initGame.hardBest[i]);
+        }
+
+    })
+
+    //关闭统窗口
+    mx.event(mx.qs(".point3", myData.gamesInfoWindow), "click", function () {  
+        myData.gamesInfoWindow.style.display = "none";
+    })
 
     //格式化时间
     function formatTime(t) {
@@ -778,8 +933,9 @@
             return t.getFullYear() + "/" + (t.getMonth() + 1) + "/" + t.getDate();
         }))
     }
+   
     //top5排序控制函数
-    function sortControl(a, b) {
+    function sortControl(a, b) {                                
         var ia, fa, ib, fb;
         ia = parseInt(a.slice(0, a.indexOf(".")));
         fa = parseInt(a.slice(a.indexOf(".") + 1));
@@ -792,202 +948,60 @@
         }
     }
 
-    //----------弹出统计信息
-    mx.event(mx.qs("#STTInfo"), "click", function () {
 
-        var mainWindowY = this.qs("#minesweeper").offsetTop;
-        var mainWindowX = this.qs("#minesweeper").offsetLeft;
+    //*****************游戏获胜弹出窗口*****************/
+    myData.gamesWinWindow = mx.qs("#games-win-window");
+    myData.gamesWinContent = mx.qs("#spendTime");
 
-        if (this.level === 1) {
-            gamesInfo.style.top = parseInt(mainWindowY) + 80 + "px";
-            gamesInfo.style.left = parseInt(mainWindowX) - 15 + "px";
-        } else if (this.level === 2) {
-            gamesInfo.style.top = parseInt(mainWindowY) + 93 + "px";
-            gamesInfo.style.left = parseInt(mainWindowX) - 20 + "px";
-        } else if (this.level === 3) {
-            gamesInfo.style.top = parseInt(mainWindowY) + 93 + "px";
-            gamesInfo.style.left = parseInt(mainWindowX) + 5 + "px";
-        }
+    function winBox(mx) {
 
-        gamesInfo.style.display = "block";
-        setList.style.display = "none";
-        //默认为一般难度
-        selectNormal.style.backgroundColor = "skyblue";
-        selectMiddle.style.backgroundColor = "#F6EFEF";
-        selectHard.style.backgroundColor = "#F6EFEF";
-        //数据开始
-        rightInfo[0].innerText = initGame.normalNum;
-        rightInfo[1].innerText = initGame.normalWin;
-        rightInfo[2].innerText = parseInt((initGame.normalWin / initGame.normalNum || 0) * 100) + "%";
-        rightInfo[3].innerText = initGame.normalSucWinSave;
-        rightInfo[4].innerText = initGame.normalSucLostSave;
-        //--------------
-        for (var i = 0; i < initGame.normalBest.length; i++) {
-            leftInfo[i].innerText = formatTime(initGame.normalBest[i]);
-        }
+        var top,left;
+        [top, left] = windowLoc(214,139);
+
+        myData.gamesWinWindow.style.top = top + "px";
+        myData.gamesWinWindow.style.left = left + "px";
+        myData.gamesWinWindow.style.display = "block";
+        myData.gamesWinContent.innerText += mx.timer.getTime() + "秒";
+    }
+    //关闭窗口
+    mx.event(mx.qs(".point3", myData.gamesWinWindow), "click", function () {
+        myData.gamesWinWindow.style.display = "none";
     })
 
+    //*******************关于游戏***************/
+    myData.selectAboutGames = mx.qs("#s-about-games");
+    myData.aboutGamesWindow = mx.qs("#about-games-window");
 
-    //----------选择要看的难度---------------------
-    mx.event(mx.qs("#selectNormal"), "click", function () {
+    mx.event(myData.selectAboutGames, "click", function () {
 
-        selectNormal.style.backgroundColor = "skyblue";
-        selectMiddle.style.backgroundColor = "#F6EFEF";
-        selectHard.style.backgroundColor = "#F6EFEF";
+        var top,left;
+        [top, left] = windowLoc(340,237);
 
-        rightInfo[0].innerText = initGame.normalNum;
-        rightInfo[1].innerText = initGame.normalWin;
-        rightInfo[2].innerText = parseInt((initGame.normalWin / initGame.normalNum || 0) * 100) + "%";
-        rightInfo[3].innerText = initGame.normalSucWinSave;
-        rightInfo[4].innerText = initGame.normalSucLostSave;
-        //----
-
-        for (var j = 0; j < 5; j++) {
-            leftInfo[j].innerText = "";
-        }
-
-        for (var i = 0; i < initGame.normalBest.length; i++) {
-            leftInfo[i].innerText = formatTime(initGame.normalBest[i]);
-        }
+        myData.aboutGamesWindow.style.top = top + "px";
+        myData.aboutGamesWindow.style.left = left + "px";
+        myData.aboutGamesWindow.style.display = "block";
+    })
+    //关闭窗口
+    mx.event(mx.qs(".point3",myData.aboutGamesWindow), "click", function () {
+        myData.aboutGamesWindow.style.display = "none";
     })
 
-    mx.event(mx.qs("#selectMiddle"), "click", function () {
-        selectNormal.style.backgroundColor = "#F6EFEF";
-        selectMiddle.style.backgroundColor = "skyblue";
-        selectHard.style.backgroundColor = "#F6EFEF";
+    //*******************弹出窗口位置**************/
+    myData.minesweeper = mx.qs("#minesweeper");
 
-        rightInfo[0].innerText = initGame.middleNum;
-        rightInfo[1].innerText = initGame.middleWin;
-        rightInfo[2].innerText = parseInt((initGame.middleWin / initGame.middleNum || 0) * 100) + "%";
-        rightInfo[3].innerText = initGame.middleSucWinSave;
-        rightInfo[4].innerText = initGame.middleSucLostSave;
-        //----
-
-        for (var j = 0; j < 5; j++) {
-            leftInfo[j].innerText = "";
-        }
-
-        for (var i = 0; i < initGame.middleBest.length; i++) {
-            leftInfo[i].innerText = formatTime(initGame.middleBest[i]);
-        }
-    })
-
-    mx.event(mx.qs("#selectHard"), "click", function () {
-        selectNormal.style.backgroundColor = "#F6EFEF";
-        selectMiddle.style.backgroundColor = "#F6EFEF";
-        selectHard.style.backgroundColor = "skyblue";
-
-        rightInfo[0].innerText = initGame.hardNum;
-        rightInfo[1].innerText = initGame.hardWin;
-        rightInfo[2].innerText = parseInt((initGame.hardWin / initGame.hardNum || 0) * 100) + "%";
-        rightInfo[3].innerText = initGame.hardSucWinSave;
-        rightInfo[4].innerText = initGame.hardSucLostSave;
-        //-----
-        for (var j = 0; j < 5; j++) {
-            leftInfo[j].innerText = "";
-        }
-
-        for (var i = 0; i < initGame.hardBest.length; i++) {
-            leftInfo[i].innerText = formatTime(initGame.hardBest[i]);
-        }
-
-    })
-
-
-    mx.event(mx.qs("#close"), "click", function () {
-        var gamesInfo = mx.qs("#gamesInfo");
-        gamesInfo.style.display = "none";
-    })
-
-    //------------------游戏胜利-------------------
-
-    var winInfo = mx.qs("#winInfo");
-
-    function winBox(mx, t) {
-
-        if (mx.level === 1) {
-            winInfo.style.left = 0.2 + "em";
-            winInfo.style.top = 5.2 + "em";
-        } else if (mx.level === 2) {
-            winInfo.style.left = 4.4 + "em";
-            winInfo.style.top = 8.5 + "em";
-        } else if (mx.level === 3) {
-            winInfo.style.left = 12.8 + "em";
-            winInfo.style.top = 8.5 + "em";
-        }
-
-        winInfo.style.display = "block";
-
-        mx.qs("#spendTime", winInfo).innerText = mx.timer.getTime();
-
+    function windowLoc (aw, ah) {
+        var m = myData.minesweeper;
+        var w = m.offsetWidth;
+        var h = m.offsetHeight;
+        var y = m.offsetTop;
+        var x = m.offsetLeft;
+        return [y + ((h - ah) / 2), x + ((w - aw) / 2)];
     }
 
-    mx.event(mx.qs("#winInfoBT"), "click", function () {
-        mx.attr(winInfo, "style", "display : none");
-    })
-
-    //-------------------颜色更改--------------------
-    var bgColor = Object.create(null);
-    bgColor.blue = "rgb(60,130,200)";
-    bgColor.green = "rgb(100,180,120)";
-    bgColor.red = "rgb(230,110,155)";
-
-    mx.event(mx.qs("#bluebg"), "click", function () {
-        for (var y = 0; y < this.lineY; y++) {
-            for (var x = 0; x < this.lineX; x++) {
-                this.box[y][x].el.coverTop.style.backgroundColor = bgColor.blue;
-                this.box[y][x].el.coverBottom.style.backgroundColor = bgColor.blue;
-            }
-        }
-        setList.style.display = "none";
-        initGame.startColorBG.cover = bgColor.blue;
-        saveGameData();
-    })
-
-    mx.event(mx.qs("#greenbg"), "click", function () {
-        for (var y = 0; y < this.lineY; y++) {
-            for (var x = 0; x < this.lineX; x++) {
-                this.box[y][x].el.coverTop.style.backgroundColor = bgColor.green;
-                this.box[y][x].el.coverBottom.style.backgroundColor = bgColor.green;
-            }
-        }
-        setList.style.display = "none";
-        initGame.startColorBG.cover = bgColor.green;
-        saveGameData();
-    })
-
-    mx.event(mx.qs("#redbg"), "click", function () {
-        for (var y = 0; y < this.lineY; y++) {
-            for (var x = 0; x < this.lineX; x++) {
-                this.box[y][x].el.coverTop.style.backgroundColor = bgColor.red;
-                this.box[y][x].el.coverBottom.style.backgroundColor = bgColor.red;
-            }
-        }
-        setList.style.display = "none";
-        initGame.startColorBG.cover = bgColor.red;
-        saveGameData();
-    })
-
-    //关于
-    var about_box = mx.qs("#about_box");
-    mx.event(mx.qs("#about"), "click", function () {
-        var mainWindowY = this.qs("#minesweeper").offsetTop;
-        var mainWindowX = this.qs("#minesweeper").offsetLeft;
-
-        about_box.style.top = mainWindowY + 80 + "px";
-        about_box.style.left = mainWindowX + 30 + "px";
-
-        about_box.style.display = "block";
-    })
-
-    mx.event(mx.qs("#about_close"), "click", function () {
-        about_box.style.display = "none";
-    })
-
-
-    //让窗口具有移动功能
-    moveElement("#nav", "#minesweeper");
-    moveElement("#gamesInfo #top", "#gamesInfo");
-    moveElement("#about_title", "#about_box");
+    //******************移动窗口******************/
+    moveElement("#move-mine", "#minesweeper");
+    moveElement("#move-win", "#games-win-window");
+    moveElement("#move-info", "#games-info-window");
+    moveElement("#move-about", "#about-games-window");
 
 })(document);
