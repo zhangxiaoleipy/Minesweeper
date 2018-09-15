@@ -22,6 +22,8 @@
 
 仅在内核为Chromium53.0.2785.104的浏览器上运行正常，其它浏览器没有测试。
 
+*DEMO* : [网页版扫雷](https://zhangxiaoleipy.github.io/%E7%BD%91%E9%A1%B5%E7%89%88%E6%89%AB%E9%9B%B7/main.html)
+
 ## 更新
 
 ### 2017年9月29日 :
