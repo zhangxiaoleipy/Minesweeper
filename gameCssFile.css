@@ -1,74 +1,147 @@
-*{
-    margin: 0;
-    padding: 0;
-}
 
-body{
-    padding: 20px;
-    font-family: "微软雅黑";
-    background-color: #FFF;
-}
+/*-----------设置按钮------------------*/
 
-#minesweeper{
-    color : #444;
-    position: absolute;
-    top : 30px;
-    left : 50px;
-    border : 1px solid #888;
-    display: table;
-    box-shadow: 0 0 10px #777;
-    border-radius: 5px;
-    background-color: #E3E9EB;
+#minesweeper {
+    margin : 30px 0 0 120px;
     user-select:none;
     -webkit-user-select: none;
 }
 
-#nav{
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    box-sizing: border-box;
-    cursor: default;
-    text-align: center;
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
-    margin: 5px 5px 0 5px;
-    height: 25px;
-    border : 1px solid #AAA4A4;
-    border-bottom: none;
-    background : linear-gradient(to bottom, #F0F0F0, #DDD);
+#option{
+    position: absolute;
+    left : 2px;
+    border-radius : 3px;
+    margin-left: 1px;
+    margin-top : 1px;
+    height: 19px;
+    width : 30px;
 }
 
-#nav span{
-    font-size: 0.8em;
-    margin-left: 5px;
-    color : #555;
+#option:hover{
+    background-color: #DFD9D9;
 }
 
-#container{
-    box-sizing: border-box;
-    cursor: default;
-    background-color: #F8F4F4;
+#option:before{
+    content: "";
+    position: absolute;
+    border-top : 1px solid #333;
+    top : 4px;
+    left: 4px;
+    width : 22px;
+    box-shadow:  0 5px #333, 0 10px #333;
+}
+
+/*-----------------------弹出菜单----------*/
+#s-list{
+    font-size: 0.9em;
     position: relative;
-    margin : 0 5px 5px 5px;
-    padding: 10px 10px 25px 10px;
-    border : 1px solid #AAA4A4;
-    border-bottom-left-radius: 5px;
-    border-bottom-right-radius: 5px;
+    color : #333;
+    display: none;
+    top : 0;
+    left: 0;
+    z-index: 11;
 }
 
+#s-list ul{
+    padding: 3px 4px 3px 5px;
+    width : 4.5em;
+    background-color: #F5F5F5;
+    box-shadow: -1px 0 2px #555, 1px 2px 3px #555;
+    border-radius: 3px;
+}
+
+#s-list ul li{
+    position: relative;
+    list-style: none;
+    text-align: left;
+    cursor: default;
+    margin: 2px 0;
+    padding-left: 2px;
+}
+
+#s-list li:hover{
+    background-color: skyblue;
+}
+
+#s-list ul li:hover ul{
+    display: block;
+}
+
+#s-list ul ul {
+    z-index: 12;
+    border : 1px solid gray;
+    position: absolute;
+    list-style: none;
+    width : 4.5em;
+    top : -1px;
+    left : 4.4em;
+    background-color: #F5F5F5;
+    box-shadow: -1px 0 5px #999, 1px 1px 8px #555;
+}
+
+#s-list ul li>ul{
+    display: none;
+}
+
+.spot{
+    display: inline-block;
+    position: absolute;
+}
+
+.spot:before{
+    content: "";
+    position: absolute;
+    border-left: 1px solid gray;
+    height: 1px;
+    left: 25px;
+    top : 6px;
+    box-shadow: 1px 1px gray,2px 2px gray,3px 3px gray,4px 4px gray,
+    3px 5px gray, 2px 6px gray, 1px 7px gray, 0px 8px gray;
+}
+
+/**************顶部时间和雷数*******************/
+
+#topTools {
+    display: flex;
+    flex-grow: 1;
+    justify-content: space-around;
+    text-align: center;
+    margin: 20px auto 10px auto;
+}
+
+#topTools .toolBox, #topTools .label{
+    display: inline-block;
+    font-size: 0.6rem;
+    color : #999;
+}
+
+#topTools #timer, #topTools #mineNum{
+    color : #555;
+    font-size: 1rem;
+    text-shadow: 1px 1px 2px gray;
+    text-align: center;
+    border : 1px solid #eee;
+    display: inline-block;
+    width : 48px;
+    border-radius: 3px;
+    background-color: rgba(201, 206, 211, 0.7);
+    box-shadow: inset 1px 1px 1px #AAA4A4;
+}
+
+/********格子区域***********************************/
 #desk{
-    margin: 5px 20px;
+    margin: 20px 35px;
     border-collapse : collapse;
     box-shadow: 0 0 1px #999;
 }
 
 #desk tr td{
+    box-sizing: border-box;
     cursor: default;
     position: relative;
     text-align: center;
-    width : 18px;
-    height: 18px;
+    width : 19px;
+    height: 19px;
     border : 1px solid #333;
 }
 
@@ -165,6 +238,7 @@ body{
     background-color: #333;
 }
 
+/*--------------地雷的图标绘制---------------------*/
 #desk tr td .mine .mineMine:before{
     position: absolute;
     content: "";
@@ -192,365 +266,125 @@ body{
     background-color: rgb(210,210,210);
 }
 
-/*----------------------------------------------*/
 
-#topTools {
+/**********************游戏胜利**********************/
+
+#games-win-window {
+    position: absolute;
+    display: none;
+    z-index: 100;
+}
+
+#games-win-content {
     display: flex;
+    flex-direction: column;
+    justify-content: center;
     align-items: center;
-    justify-content: space-around;
-    text-align: center;
-    margin: 5px auto 10px auto;
+    width : 200px;
+    height: 100px;
 }
 
-#topTools .toolBox{
-    display: table;
+#games-win-content span{
+    font-size: 1.2rem;
 }
 
-#topTools .label{
-    color : #888;
-    display: inline-block;
-    font-size: 0.7em;
-}
+/****************信息统计***********************/
 
-#topTools #timer, #topTools #mineNum{
-    color : #555;
-    text-shadow: 1px 1px 2px gray;
-    text-align: center;
-    border : 1px solid #eee;
-    display: inline-block;
-    width : 48px;
-    border-radius: 3px;
-    background-color: rgba(201, 206, 211, 0.7);
-    box-shadow: inset 1px 1px 1px #AAA4A4;
-}
-
-/*---------------SETTING----------------*/
-
-#setting{
-    float: left;
-    position: absolute;
-    left : 2px;
-    top : 2px;
-    border-radius : 3px;
-    margin-left: 1px;
-    margin-top : 1px;
-    height: 19px;
-    width : 30px;
-}
-
-#setting:hover{
-    background-color: #DFD9D9;
-}
-
-#setting:before{
-    content: "";
-    position: absolute;
-    border-top : 1px solid #333;
-    top : 4px;
-    left: 4px;
-    width : 22px;
-    box-shadow:  0 5px #333, 0 10px #333;
-}
-
-#setList{
-    font-size: 0.9em;
-    position: relative;
-    color : #333;
+#games-info-window{
     display: none;
-    top : 16px;
-    left: 0;
-    z-index: 11;
+    z-index: 100;
 }
 
-#setList ul{
-    padding: 3px 4px 3px 5px;
-    width : 4.5em;
-    background-color: #F5F5F5;
-    box-shadow: -1px 0 2px #555, 1px 2px 3px #555;
-    border-radius: 3px;
-}
-
-#setList ul li{
-    position: relative;
-    list-style: none;
-    text-align: left;
-    cursor: default;
-    margin: 2px 0;
-    padding-left: 2px;
-}
-
-#setList li:hover{
-    background-color: skyblue;
-}
-
-#setList ul li:hover ul{
-    display: block;
-}
-
-#setList ul ul {
-    z-index: 12;
-    border : 1px solid gray;
-    position: absolute;
-    list-style: none;
-    width : 4.5em;
-    top : -1px;
-    left : 4.4em;
-    background-color: #F5F5F5;
-    box-shadow: -1px 0 5px #999, 1px 1px 8px #555;
-}
-
-#setList ul li>ul{
-    display: none;
-}
-
-.spot{
-    display: inline-block;
-    position: absolute;
-}
-
-.spot:before{
-    content: "";
-    position: absolute;
-    border-left: 1px solid gray;
-    height: 1px;
-    left: 25px;
-    top : 6px;
-    box-shadow: 1px 1px gray,2px 2px gray,3px 3px gray,4px 4px gray,
-    3px 5px gray, 2px 6px gray, 1px 7px gray, 0px 8px gray;
-}
-
-/*************************************************/
-
-#winInfo{
-    display: none;
-    position: absolute;
-    z-index: 15;
-    background-color: white;
-    width : 14em;
-    height: 7em;
-    border : 1px solid gray;
-    border-radius: 5px;
-    box-shadow: 0 0 5px #333;
-}
-
-#winInfo #winContent {
-    text-align: center;
-    margin: 1em auto;
-    width : 8em;
-}
-
-#winInfoBT{
-    cursor: pointer;
-    position: absolute;
-    left : 5.8em;
-    padding: 2px 5px;
-    border : 1px solid gray;
-    border-radius: 4px;
-}
-
-/*******************************************/
-
-#gamesInfo{
-    display: none;
-    font-size: 0.8em;
-    z-index: 15;
-    position: absolute;
-    border : 1px solid #888;
-    border-radius: 5px;
-    background-color: #E3E9EB;
-    box-shadow: 0 0 10px #777;
-}
-
-#gamesInfo #top{
+#contentBox {
+    z-index: 100;
+    font-size: 0.8rem;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: default;
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
-    box-sizing: border-box;
-    border : 1px solid #AAA4A4;
-    border-bottom: none;
-    height: 25px;
-    width : 410px;
-    margin: 5px 5px 0 5px;
-    background : linear-gradient(to bottom, #F0F0F0, #DDD);
-}
-
-#gamesInfo #top span{
-    margin-left: 5px;
-}
-
-#goContent{
-    box-sizing: border-box;
-    position: relative;
-    margin: 0 5px 5px 5px;
-    width : 410px;
-    height: 250px;
-    border : 1px solid #999;
-    background-color: #F6EFEF;
-    border-bottom-left-radius: 5px;
-    border-bottom-right-radius: 5px;
-}
-
-#goContent #contentBox {
-    display: table;
+    justify-content: center;
+    flex-wrap: wrap;
+    align-content: center;
+    width : 370px;
+    margin: 15px 15px 20px 15px;
     box-shadow: 0 0 3px gray;
-    margin: 10px auto;
 }
 
-#gamesInfo table{
-    box-sizing: border-box;
+#contentBox table{
+    width : 100%;
     border-collapse: collapse;
-    width : 370px;
-    margin: 0 auto;
-    background-color: white;
 }
 
-#gamesInfo table td{
+#contentBox table td{
     cursor: default;
-    height: 1.8em;
+    height: 25px;
     text-align: center;
     border : 1px solid #999;
+    border-bottom: none;
 }
 
-#gamesInfo #threeInfo{
+#contentBox #threeInfo{
+    display: flex;
+    width : 100%;
     background-color: white;
-    box-sizing: border-box;
-    border : 1px solid #999;
     border-top: none;
-    width : 370px;
     height: 180px;
-    margin: auto;
+    border : 1px solid #999;
 }
 
-#gamesInfo #threeInfo #win5,
-#gamesInfo #threeInfo #win5info {
+#contentBox #threeInfo #win5,
+#contentBox #threeInfo #win5info {
     position: relative;
-    box-sizing: border-box;
-    float: left;
-    width : 160px;
-    height: 176px;
-    margin: 1px;
+    display: flex;
+    width : 50%;
+    justify-content: center;
+    align-items: center;
 }
 
-#gamesInfo #threeInfo #win5info ul{
-    position: absolute;
-    left: 50px;
-    top : 25px;
-}
-
-#gamesInfo #threeInfo #win5 ul{
-    z-index: 20;
-    position: absolute;
-    padding-left: 15px;
-    padding-top: 5px;
-    width : 110px;
-    height: 120px;
-    left: 40px;
-    top : 20px;
-    border : 1px solid #ddd;
-    border-radius: 3px;
-}
-
-#gamesInfo #threeInfo #win5 span{
+#contentBox #threeInfo #win5 span{
     z-index: 21;
     color : #888;
     position: absolute;
     display: inline-block;
     padding: 0 3px;
     left: 50px;
-    top : 11px;
+    top : 23px;
     background-color: white;
 }
 
-#gamesInfo #threeInfo #win5 ul li,
-#gamesInfo #threeInfo #win5info ul li
+#contentBox #threeInfo #win5 ul,
+#contentBox #threeInfo #win5info ul
+{
+    padding-left: 0;
+    width : 140px;
+}
+
+#contentBox #threeInfo #win5info ul {
+    margin-left: 50px;
+}
+
+#contentBox #threeInfo #win5 ul{
+    width : 110px;
+    height: 115px;
+    padding: 0 0 0 5px;
+    border : 1px solid #AAA;
+    border-radius: 5px;
+}
+
+#contentBox #threeInfo #win5 ul li,
+#contentBox #threeInfo #win5info ul li
 {
     list-style: none;
     margin : 5px 0;
 }
 
-#gamesInfo #infoBT{
-    margin-top: 6px;
-    text-align: center;
-    position: relative;
-    height: 38px;
-}
 
-/*-----------about-------------*/
-
-#about_box{
-    display: none;
-    font-size: 0.8em;
-    z-index: 15;
+/* --------------关于游戏-------------*/
+#about-games-window{
     position: absolute;
-    border : 1px solid gray;
-    background-color: #E3E9EB;
-    border-radius: 5px;
-    box-shadow: 0 0 10px #777;
-    border : 1px solid #888;
+    z-index: 101;
+    font-size: 0.8rem;
+    display: none;
 }
 
-#about_box #about_title{
-    box-sizing: border-box;
-    margin: 5px 5px 0 5px;
-    cursor: default;
-    padding-left: 5px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+#about-games-content{
     width : 300px;
-    height: 25px;
-    border : 1px solid #AAA4A4;
-    border-bottom: none;
-    background : linear-gradient(to bottom, #F0F0F0, #DDD);
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
-    user-select:none;
-    -webkit-user-select: none;
-}
-
-#about_box #about_content{
-    box-sizing: border-box;
-    padding: 1em;
-    background-color: #F8F4F4;    
-    margin: 0 5px 5px 5px;
-    color : #333;
-    width : 300px;
-    height: 200px;
-    border-top: none;
-    border : 1px solid gray;
-    overflow: auto;
-}
-
-
-.xicon3{
-    margin-right: 5px;
-    border-collapse: separate;
-    border-spacing: 2px;
-}
-
-.xicon{
-    box-sizing: border-box;
-    display: table-cell;
-    width : 14px;
-    height: 14px;
-    border-radius: 3px;
-}
-
-.xicon:nth-of-type(1) {
-    background-color: #59C73B;
-}
-
-.xicon:nth-of-type(2) {
-    background-color: #E2A127;
-}
-
-.xicon:nth-of-type(3) {
-    background-color: #E25E69;
-}
-
-.xicon:nth-of-type(3):hover{
-    background-color: #C53742;
+    margin: 1em;
 }
