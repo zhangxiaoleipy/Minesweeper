@@ -6,9 +6,6 @@
 
 整个雷区就是通过一个table实现的，每个td元素内包含着数个div，通过类似率Ps图层的方法进行显示控制。
 
-大概就是这个样子。
-![pic001](https://github.com/zhangxiaoleipy/Minesweeper/blob/master/Screenshots/pic001.PNG)
-
 * 支持双键操作
 * 如果一片是空白，将自动打开一片
 * 第一步不是雷
@@ -19,7 +16,7 @@
 
 仅在内核为Chromium53.0.2785.104的浏览器上运行正常，其它浏览器没有测试。
 
-*DEMO* : [网页版扫雷](https://zhangxiaoleipy.github.io/%E7%BD%91%E9%A1%B5%E7%89%88%E6%89%AB%E9%9B%B7/main.html)
+*游戏地址* : [网页版扫雷](https://zhangxiaoleiwk.gitee.io/saolei.html)
 
 ## 更新
 
